@@ -26,20 +26,32 @@ MongoClient.connect(connectUrl, {
     return console.log('unable to connect to db');
   }
   const db = client.db(dbName);
-  //first collection
-  // db.collection('consumers').insertOne({
-  //   _id: id,
-  //   name: 'lendo',
-  //   age: 25
-  // }, (error, result) => {
-  //   if (error) {
-  //     return console.log('unable to insert documents');
-  //   }
-  //   console.log(result.ops);
-  // });
-
-  // 
+  db.collection('consumers').findOne({
+    name: 'jen'
+  }, (error, consumer) => {
+    if (error) {
+      return console.log('Unable to find .')
+    }
+    console.log(consumer);
+  })
 });
+
+
+
+
+//first collection
+// db.collection('consumers').insertOne({
+//   _id: id,
+//   name: 'lendo',
+//   age: 25
+// }, (error, result) => {
+//   if (error) {
+//     return console.log('unable to insert documents');
+//   }
+//   console.log(result.ops);
+// });
+
+// 
 // //second collection
 // db.collection('tasks').insertMany([{
 //     description: 'do mongodb course',
