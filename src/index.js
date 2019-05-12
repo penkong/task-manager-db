@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 //to parse incoming json to us by post to obj
 app.use(express.json());
 
-app.use('/users', userRouter);
+app.use(userRouter);
 app.use(taskRouter);
 
 //============== LISTEN SERVER ====================
