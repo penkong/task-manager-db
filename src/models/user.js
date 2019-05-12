@@ -51,6 +51,16 @@ const userSchema = new mongoose.Schema({
     }
   }]
 });
+//-------------------SEND PUBLIC INFO -----------------
+//because user of this no arrow func
+// send do stringify behind scene and before that we use tojson to can manipulate that
+userSchema.methods.toJSON = function () {
+  const user = this;
+  const userObj = user.toObject(); //provided by mongoose
+  delete userObj.password;
+  delete userObj.tokens;
+  return userObj;
+}
 
 //-------------------JWT GENERATE ---------------------
 //standard func because of binding value of this;
