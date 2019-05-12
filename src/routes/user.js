@@ -1,10 +1,8 @@
 const express = require('express');
-
 //-------------DB---------------------
 const User = require('../models/user');
-
-
 //...............................................
+const auth = require('../middleware/auth'); // for add auth to routes
 const router = new express.Router();
 //----USER COLLECTION-----
 //-----------------CREATE-------------------------
@@ -45,13 +43,13 @@ router.post('/users/login', async (req, res) => {
 })
 
 //------------------READ---------------------
-router.get('/users', async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (e) {
-    res.status(500).send();
-  }
+router.get('/users/me', auth, async (req, res) => {
+  res.send(req.user);
+  // try {
+  //   const users = await User.find({});
+  // } catch (e) {
+  //   res.status(500).send();
+  // }
   // User.find({}).then((users) => {
   //   res.send(users);
   // }).catch((e) => {
@@ -123,3 +121,7 @@ router.delete('/users/:id', async (req, res) => {
 
 
 module.exports = router;
+// for postman test dynamic token
+// if(pm.response.code === 200){
+//   pm.environment.set('authToken',pm.response.json().token)
+// }
