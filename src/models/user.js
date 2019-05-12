@@ -3,6 +3,8 @@ const validator = require('validator');
 // middleware let us customize treat of mongoose
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+// for removing whole tasks after user delete by middleware
+const Task = require('./task');
 
 //mongoose convert sec params of model to schema behind scene
 const userSchema = new mongoose.Schema({
@@ -51,6 +53,20 @@ const userSchema = new mongoose.Schema({
     }
   }]
 });
+
+// -----------------VIRTUAL -----------------------
+//relation ship between 2 entities its not change anything 
+//just for mongooose to find how related things are
+//ref of tasks save on db but this not
+//lf is relation ff is name of field in other model maintain info
+userSchema.virtual('tasks', {
+  ref: 'Task',
+  localField: '_id',
+  foreignField: 'owner'
+})
+
+
+
 //-------------------SEND PUBLIC INFO -----------------
 //because user of this no arrow func
 // send do stringify behind scene and before that we use tojson to can manipulate that
@@ -108,6 +124,15 @@ userSchema.pre('save', async function (next) {
   //end
   next();
 });
+//---------------------DELETE TASKS OF DELETED USER ----------
+userSchema.pre('remove', async function (next) {
+  const user = this;
+  await Task.deleteMany({
+    owner: user._id
+  });
+  next();
+})
+
 
 //--------------------- MODAL CREATION --------------------
 const User = mongoose.model('User', userSchema);

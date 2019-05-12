@@ -3,15 +3,20 @@ const express = require('express');
 
 //-------------DB---------------------
 const Task = require('../models/task');
-
+//------------auth middleware-------------
+const auth = require('../middleware/auth');
 //...............................................
 const router = new express.Router();
 
 //----TASK COLLECTION-----
 //------------------CREATE---------------------
 
-router.post('/tasks', async (req, res) => {
-  const task = new Task(req.body);
+router.post('/tasks', auth, async (req, res) => {
+  // const task = new Task(req.body);
+  const task = new Task({
+    ...req.body,
+    owner: req.user._id
+  })
   try {
     await task.save();
     res.status(201).send(task);
@@ -26,43 +31,35 @@ router.post('/tasks', async (req, res) => {
 });
 
 //------------------READ---------------------
-router.get('/tasks', async (req, res) => {
+router.get('/tasks', auth, async (req, res) => {
   try {
-    const tasks = await Task.find({});
-    res.send(tasks);
+    // const tasks = await Task.find({owner: req.user._id});
+    //populate from id bring profile
+    await req.user.populate('tasks').execPopulate();
+    res.send(req.user.tasks);
   } catch (e) {
     res.status(500).send();
   }
-  // Task.find({}).then((tasks) => {
-  //   res.send(tasks);
-  // }).catch((e) => {
-  //   res.status(500).send();
-  // })
 })
 
-router.get('/tasks/:id', async (req, res) => {
+router.get('/tasks/:id', auth, async (req, res) => {
   //mongoose change string id to obj by itself thnx mongooose.
   const _id = req.params.id;
   //find bring back whole doc but update bring a part
   try {
-    const task = await Task.findById(_id);
+    const task = await Task.findOne({
+      _id,
+      owner: req.user._id
+    })
     if (!task) return res.status(404).send();
     res.send(task);
   } catch (e) {
     res.status(500).send();
   }
-  Task.findById(_id).then((task) => {
-    if (!task) {
-      return res.status(404).send();
-    }
-    res.send(task);
-  }).catch((e) => {
-    res.status(500).send();
-  })
 })
 
 //----------------- UPDATE ----------------------
-router.patch('/tasks/:id', async (req, res) => {
+router.patch('/tasks/:id', auth, async (req, res) => {
   //check related input head to already exist collection 
   const updates = Object.keys(req.body);
   const allowedUpdates = ['description', 'completed'];
@@ -72,14 +69,18 @@ router.patch('/tasks/:id', async (req, res) => {
   });
   // now check related are mean or not. 
   try {
-    const task = await Task.findById(req.params.id);
-    updates.forEach((update) => task[update] = req.body[update]);
-    await task.save();
+    // const task = await Task.findById(req.params.id);
     // const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
     //   new: true,
     //   runValidators: true
     // })
+    const task = await Task.findOne({
+      _id: req.params.id,
+      owner: req.user._id
+    });
     if (!task) return res.status(404).send();
+    updates.forEach((update) => task[update] = req.body[update]);
+    await task.save();
     res.send(task);
   } catch (e) {
     res.status(400).send();
@@ -87,10 +88,14 @@ router.patch('/tasks/:id', async (req, res) => {
 })
 
 //------------------DELETE---------------------
-router.delete('/tasks/:id', async (req, res) => {
-  const _id = req.params.id;
+router.delete('/tasks/:id', auth, async (req, res) => {
+  // const _id = req.params.id;
+  // const task = await Task.findByIdAndDelete(_id)
   try {
-    const task = await Task.findByIdAndDelete(_id)
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user._id
+    })
     if (!task) return res.status(404).send();
     res.send(task)
   } catch (e) {
