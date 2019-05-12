@@ -4,6 +4,7 @@ const router = new express.Router()
 // we put main db file here to express can connect to it.
 require('./db/mongoose');
 //----------------ROUTES -----------------
+//all routes become 2 kinds , public or authenticated routs
 const userRouter = require('./routes/user');
 const taskRouter = require('./routes/task');
 

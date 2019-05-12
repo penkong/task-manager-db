@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 // middleware let us customize treat of mongoose
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 //mongoose convert sec params of model to schema behind scene
 const userSchema = new mongoose.Schema({
@@ -41,11 +42,37 @@ const userSchema = new mongoose.Schema({
         throw new Error('age must be a positive number');
       }
     }
-  }
+  },
+  //track token by server we find it in good hand we store it
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    }
+  }]
 });
+
+//-------------------JWT GENERATE ---------------------
+//standard func because of binding value of this;
+//setup login bring back auth token  - jsonwebtoken
+//methods are accessible by instances
+userSchema.methods.generateAuthToken = async function () {
+  const user = this; //payload,id - secret - obj expire
+  const token = jwt.sign({
+    _id: user._id.toString()
+  }, 'thisismycode')
+  //add generated token to array of tokens and save ans use it
+  user.tokens = user.tokens.concat({
+    token
+  });
+  //and also shows up in db
+  await user.save();
+  return token;
+}
 
 //------------------- LOGIN VERIFY --------------------
 //by set here we can access this method directly from User obj
+//statics are accessible by model
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({
     email
