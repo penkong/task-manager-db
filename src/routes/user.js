@@ -27,7 +27,10 @@ router.post('/users', async (req, res) => {
   // });
 });
 
+
+//------------------READ---------------------
 //......for login verification
+//relate to auth
 router.post('/users/login', async (req, res) => {
   try {
     // user reusable code.
@@ -41,8 +44,30 @@ router.post('/users/login', async (req, res) => {
     res.status(400).send();
   }
 })
+//relate to auth 
+router.post('/users/logout', auth, async (req, res) => {
+  try {
+    req.user.tokens = req.user.tokens.filter((token) => {
+      return token.token !== req.token;
+    })
+    await req.user.save();
+    res.send();
+  } catch (e) {
+    res.status(500).send();
+  }
+})
+//relate to auth 
+router.post('/users/logoutall', auth, async (req, res) => {
+  try {
+    req.user.tokens = [];
+    await req.user.save();
+    res.send();
+  } catch (e) {
+    res.status(500).send();
+  }
+})
 
-//------------------READ---------------------
+//relate to auth
 router.get('/users/me', auth, async (req, res) => {
   res.send(req.user);
   // try {
