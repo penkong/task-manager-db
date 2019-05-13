@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 
-// const taskSchema = new mongoose.Schema({
-
-// })
-const Task = mongoose.model('Task', {
+const taskSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
@@ -18,8 +15,13 @@ const Task = mongoose.model('Task', {
     require: true,
     ref: 'User'
   }
-  // ref let lan models can easily fetch the entire user profile
-  // populate let us know which user create which task bring profile by id
-});
+  },
+  {
+    timestamps : true
+  }
+)
+// ref let lan models can easily fetch the entire user profile
+// populate let us know which user create which task bring profile by id
+const Task = mongoose.model('Task', taskSchema);
 
 module.exports = Task;

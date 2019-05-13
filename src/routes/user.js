@@ -88,12 +88,6 @@ router.patch('/users/me', auth, async (req, res) => {
     // const user = await User.findById(req.user);
     updates.forEach((update) => req.user[update] = req.body[update]);
     await req.user.save();
-    // this bypass mongoose find by id and update and effect directly on db.
-    // const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    //   new: true,
-    //   runValidators: true
-    // })
-    // if (!user) return res.status(404).send();
     res.send(req.user);
   } catch (e) {
     res.status(400).send();

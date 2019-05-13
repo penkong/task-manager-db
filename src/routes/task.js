@@ -31,11 +31,21 @@ router.post('/tasks', auth, async (req, res) => {
 });
 
 //------------------READ---------------------
+// add query string for filtering and sorting , not fetch all data
+//limit and skip for pagination
 router.get('/tasks', auth, async (req, res) => {
+  //filtering
+  const match = {};
+  if (req.query.completed) {
+    //when type false or true in query its a string not boo
+    match.completed = req.query.completed === 'true';
+  }
   try {
-    // const tasks = await Task.find({owner: req.user._id});
     //populate from id bring profile
-    await req.user.populate('tasks').execPopulate();
+    await req.user.populate({
+      path : 'tasks',
+      match
+    }).execPopulate();
     res.send(req.user.tasks);
   } catch (e) {
     res.status(500).send();

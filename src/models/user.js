@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const Task = require('./task');
 
 //mongoose convert sec params of model to schema behind scene
+//by schema we can use middle ware functiuonality of monggose
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -52,7 +53,11 @@ const userSchema = new mongoose.Schema({
       required: true
     }
   }]
-});
+  },
+  {
+    timestamps: true
+  }
+);
 
 // -----------------VIRTUAL -----------------------
 //relation ship between 2 entities its not change anything 
@@ -64,8 +69,6 @@ userSchema.virtual('tasks', {
   localField: '_id',
   foreignField: 'owner'
 })
-
-
 
 //-------------------SEND PUBLIC INFO -----------------
 //because user of this no arrow func
@@ -115,9 +118,10 @@ userSchema.statics.findByCredentials = async (email, password) => {
 //by change this old way to use schema we can use middleware
 //need standard func ,,, this = is a doc , user
 //some mongoose api doesn't bypass and don't run for update.
+//pre and post for events on
 userSchema.pre('save', async function (next) {
   const user = this;
-  // if pass changed
+  // if pass changed or init
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
   }
@@ -132,7 +136,6 @@ userSchema.pre('remove', async function (next) {
   });
   next();
 })
-
 
 //--------------------- MODAL CREATION --------------------
 const User = mongoose.model('User', userSchema);
