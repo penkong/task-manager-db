@@ -32,7 +32,7 @@ router.post('/tasks', auth, async (req, res) => {
 
 //------------------READ---------------------
 // add query string for filtering and sorting , not fetch all data
-//limit and skip for pagination
+//limit=10 and &skip=0 -> give 0 to 10 if 10 give 10 to 20 for pagination
 router.get('/tasks', auth, async (req, res) => {
   //filtering
   const match = {};
@@ -42,9 +42,13 @@ router.get('/tasks', auth, async (req, res) => {
   }
   try {
     //populate from id bring profile
+    // on limit what user input is not number it's string we cure
     await req.user.populate({
       path : 'tasks',
-      match
+      match,
+      options : {
+        limit : parseInt(req.query.limit)
+      }
     }).execPopulate();
     res.send(req.user.tasks);
   } catch (e) {
