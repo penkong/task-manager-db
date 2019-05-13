@@ -33,12 +33,19 @@ router.post('/tasks', auth, async (req, res) => {
 //------------------READ---------------------
 // add query string for filtering and sorting , not fetch all data
 //limit=10 and &skip=0 -> give 0 to 10 if 10 give 10 to 20 for pagination
+// sort data sortBy=field,order ->createdAt:or_asc 1 /desc -1
 router.get('/tasks', auth, async (req, res) => {
   //filtering
   const match = {};
   if (req.query.completed) {
     //when type false or true in query its a string not boo
     match.completed = req.query.completed === 'true';
+  }
+  // sorting
+  const sort = {}
+  if(req.query.sortBy){
+    const parts = req.query.sortBy.split(':');
+    sort[parts[0]] = parts[1] === 'desc'? -1 : 1; 
   }
   try {
     //populate from id bring profile
@@ -48,7 +55,8 @@ router.get('/tasks', auth, async (req, res) => {
       match,
       options : {
         limit : parseInt(req.query.limit),
-        skip : parseInt(req.query.skip)
+        skip : parseInt(req.query.skip),
+        sort
       }
     }).execPopulate();
     res.send(req.user.tasks);
