@@ -97,11 +97,24 @@ router.delete('/users/me', auth, async (req, res) => {
 
 // ----------------Upload MULTER --------------------
 //we use form -data , create endpoint , put middlew of multer
-const upload = multer({ dest : 'avatars' }); //images, pdf ,...
+const upload = multer({ 
+  dest : 'avatars',
+  limits : {
+    fileSize : 1000000
+  },
+  fileFilter(req,file,cb){
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error('please upload a picture.'))
+    }
+    cb(undefined,true);
+  }
+}); //images, pdf ,...
 //.............route .........middlew ... name server know for upload...
 router.post('/users/me/avatar', upload.single('avatar'), (req,res)=>{
   res.send();
 })
+
+
 
 
 
