@@ -7,6 +7,7 @@ const User = require('../models/user')
 
 const auth = async (req, res, next) => {
   try {
+    //we are pushing this to server by user to show we have authorization
     const token = req.header('Authorization').replace('Bearer ', '')
     const decoded = jwt.verify(token, 'thisismycode')
     const user = await User.findOne({

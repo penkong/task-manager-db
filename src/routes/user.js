@@ -1,4 +1,6 @@
 const express = require('express');
+//------------Multer-uploader------
+const multer = require('multer');
 //-------------DB---------------------
 const User = require('../models/user');
 //...............................................
@@ -62,16 +64,6 @@ router.post('/users/logoutall', auth, async (req, res) => {
 //relate to auth
 router.get('/users/me', auth, async (req, res) => {
   res.send(req.user);
-  // try {
-  //   const users = await User.find({});
-  // } catch (e) {
-  //   res.status(500).send();
-  // }
-  // User.find({}).then((users) => {
-  //   res.send(users);
-  // }).catch((e) => {
-  //   res.status(500).send();
-  // })
 })
 
 //----------------- UPDATE ----------------------
@@ -85,7 +77,6 @@ router.patch('/users/me', auth, async (req, res) => {
   });
   // now check related are mean or not. 
   try {
-    // const user = await User.findById(req.user);
     updates.forEach((update) => req.user[update] = req.body[update]);
     await req.user.save();
     res.send(req.user);
@@ -97,13 +88,19 @@ router.patch('/users/me', auth, async (req, res) => {
 //------------------DELETE---------------------
 router.delete('/users/me', auth, async (req, res) => {
   try {
-    // const user = await User.findByIdAndDelete(req.user._id)
-    // if (!user) return res.status(404).send();
     await req.user.remove();
     res.send(req.user);
   } catch (e) {
     res.status(500).send();
   }
+})
+
+// ----------------Upload MULTER --------------------
+//we use form -data , create endpoint , put middlew of multer
+const upload = multer({ dest : 'avatars' }); //images, pdf ,...
+//.............route .........middlew ... name server know for upload...
+router.post('/users/me/avatar', upload.single('avatar'), (req,res)=>{
+  res.send();
 })
 
 
