@@ -119,6 +119,20 @@ router.post('/users/me/avatar',auth ,upload.single('avatar'), async (req,res)=>{
   res.status(400).send({error : error.message});
 }) //these error handler func cause we send back json instead of html
 
+//...................FETCH AVATAR BACK FOR SHOW AS URL.......
+router.get('/users/:id/avatar', async (req,res)=>{
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user || !user.avatar) throw new Error();
+    //real magic make loadable img
+    //by set we define header for res normally 'application/json'
+    res.set('Content-Type', 'image/jpg');
+    res.send(user.avatar);
+  } catch (e) {
+    res.status(404).send();
+  }
+})
+
 
 //.....................DELETE AVATAR ...........................
 router.delete('/users/me/avatar', auth , async (req,res)=>{
