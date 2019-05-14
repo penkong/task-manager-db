@@ -95,10 +95,9 @@ router.delete('/users/me', auth, async (req, res) => {
   }
 })
 
-// ----------------Upload MULTER --------------------
+// ----------------UploadER MULTER --------------------
 //we use form -data , create endpoint , put middlew of multer
 const upload = multer({ 
-  dest : 'avatars',
   limits : {
     fileSize : 1000000
   },
@@ -109,8 +108,24 @@ const upload = multer({
     cb(undefined,true);
   }
 }); //images, pdf ,...
-//.............route .........middlew ... name server know for upload...
-router.post('/users/me/avatar', upload.single('avatar'), (req,res)=>{
+//.............route for post.........middlew ... name server know for upload...
+router.post('/users/me/avatar',auth ,upload.single('avatar'), async (req,res)=>{
+  //when we remove dest multer let us save file on db otherwise folder get it
+  //it give us buffer we must define store sys
+  req.user.avatar = req.file.buffer;
+  await req.user.save();
+  res.send();
+} ,(error, req, res, next)=>{
+  res.status(400).send({error : error.message});
+}) //these error handler func cause we send back json instead of html
+
+
+//.....................DELETE AVATAR ...........................
+router.delete('/users/me/avatar', auth , async (req,res)=>{
+  //when we remove dest multer let us save file on db otherwise folder get it
+  //it give us buffer we must define store sys
+  req.user.avatar = undefined;
+  await req.user.save();
   res.send();
 })
 

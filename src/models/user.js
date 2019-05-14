@@ -52,11 +52,13 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: true
     }
-  }]
-  },
-  {
-    timestamps: true
+  }],
+  avatar: {
+    type : Buffer
   }
+},{
+    timestamps: true
+}
 );
 
 // -----------------VIRTUAL -----------------------
