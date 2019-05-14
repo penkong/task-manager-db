@@ -80,6 +80,7 @@ userSchema.methods.toJSON = function () {
   const userObj = user.toObject(); //provided by mongoose
   delete userObj.password;
   delete userObj.tokens;
+  delete userObj.avatar;
   return userObj;
 }
 

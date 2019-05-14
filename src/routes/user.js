@@ -1,6 +1,9 @@
 const express = require('express');
 //------------Multer-uploader------
 const multer = require('multer');
+// -----------SHARP IMAGE RESIZED ----------
+// const sharp = require('sharp');
+
 //-------------DB---------------------
 const User = require('../models/user');
 //...............................................
@@ -110,9 +113,14 @@ const upload = multer({
 }); //images, pdf ,...
 //.............route for post.........middlew ... name server know for upload...
 router.post('/users/me/avatar',auth ,upload.single('avatar'), async (req,res)=>{
+  // sharp give us value
+  //when sharp correct use it.
+  // const buffer = await sharp(req.file.buffer)
+  // .resize({ width : 250 , height : 250 }).png().toBuffer();
+  // req.user.avatar = buffer;
+  req.user.avatar = req.file.buffer;
   //when we remove dest multer let us save file on db otherwise folder get it
   //it give us buffer we must define store sys
-  req.user.avatar = req.file.buffer;
   await req.user.save();
   res.send();
 } ,(error, req, res, next)=>{
@@ -126,7 +134,7 @@ router.get('/users/:id/avatar', async (req,res)=>{
     if (!user || !user.avatar) throw new Error();
     //real magic make loadable img
     //by set we define header for res normally 'application/json'
-    res.set('Content-Type', 'image/jpg');
+    res.set('Content-Type', 'image/png');
     res.send(user.avatar);
   } catch (e) {
     res.status(404).send();
