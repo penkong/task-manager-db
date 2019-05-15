@@ -8,7 +8,7 @@ const multer = require('multer');
 const User = require('../models/user');
 //...............................................
 const auth = require('../middleware/auth'); // for add auth to routes
-const { sendWelcomeEmail , sendByeEmail } = require('../emails/account');
+// const { sendWelcomeEmail , sendByeEmail } = require('../emails/account');
 const router = new express.Router();
 
 
@@ -18,7 +18,7 @@ router.post('/users', async (req, res) => {
   const user = new User(req.body);
   try {
     await user.save();
-    sendWelcomeEmail(user.email , user.name);
+    // sendWelcomeEmail(user.email , user.name);
     const token = await user.generateAuthToken();
     res.status(201).send({
       user,
@@ -96,7 +96,7 @@ router.patch('/users/me', auth, async (req, res) => {
 router.delete('/users/me', auth, async (req, res) => {
   try {
     await req.user.remove();
-    sendByeEmail(req.user.email, req.user.name);
+    // sendByeEmail(req.user.email, req.user.name);
     res.send(req.user);
   } catch (e) {
     res.status(500).send();

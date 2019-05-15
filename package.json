@@ -29,6 +29,7 @@
 		"validator": "^10.9.0"
 	},
 	"devDependencies": {
+		"env-cmd": "^9.0.1",
 		"nodemon": "^1.19.0"
 	}
 }
